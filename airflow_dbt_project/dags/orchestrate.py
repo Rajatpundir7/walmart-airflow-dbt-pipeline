@@ -1,4 +1,5 @@
 import time
+import os
 from airflow.sdk import dag, task
 from airflow.operators.bash import BashOperator
 from databricks.sdk import WorkspaceClient
@@ -11,11 +12,11 @@ def orchestrate():
     @task
     def ingest_cdc():
         ws = WorkspaceClient(
-        host="your_databricks_host",
-        token="your_databricks_token"
+        host=os.environ["DATABRICKS_HOST"],
+        token=os.environ["DATABRICKS_TOKEN"]
         )
 
-        job_trigger = ws.jobs.run_now(job_id="your_databricks_job_id")
+        job_trigger = ws.jobs.run_now(job_id=int(os.environ["DATABRICKS_JOB_ID"]))
 
         while True:
 
@@ -66,10 +67,10 @@ def orchestrate():
         bash_command='dbt test --select silver_b'
     )
 
-    gold_ephermeral = BashOperator(
-        task_id='gold_ephermeral',
+    gold_ephemeral = BashOperator(
+        task_id='gold_ephemeral',
         cwd='/opt/airflow/walmart_project',
-        bash_command='dbt run --select gold/ephermeral'
+        bash_command='dbt run --select gold/ephemeral'
     )
 
     gold_dimensions = BashOperator(
@@ -84,6 +85,6 @@ def orchestrate():
         bash_command='dbt run --select gold/fact'
     )
 
-    ingest_cdc() >> clean_target() >> source_freshness() >> silver_technical >> silver_technical_tests  >> silver_business >> silver_business_tests >> gold_ephermeral >> gold_dimensions >> gold_facts
+    ingest_cdc() >> clean_target() >> source_freshness() >> silver_technical >> silver_technical_tests  >> silver_business >> silver_business_tests >> gold_ephemeral >> gold_dimensions >> gold_facts
 
 orchestrate_dag = orchestrate()

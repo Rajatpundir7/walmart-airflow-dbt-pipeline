@@ -2,7 +2,7 @@ import psycopg2
 import os
 
 # Database connection string
-conn_string = "your_connection_string_here"
+conn_string = os.environ.get("POSTGRES_RAW_CONNECTION")
 
 # CSV files mapping to tables
 csv_files = {
@@ -16,8 +16,13 @@ csv_files = {
 
 data_dir = "data"
 
+conn = None
+
 try:
     # Connect to the database
+    if not conn_string:
+        raise ValueError("POSTGRES_RAW_CONNECTION is not set")
+
     conn = psycopg2.connect(conn_string)
     cursor = conn.cursor()
     
