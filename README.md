@@ -235,6 +235,5 @@ These notes are documented so the system behavior is transparent: the README des
 B.Tech Computer Science with AI & Machine Learning Specialization<br>
 Graphic Era Hill University, Dehradun
 
-Project video: [Watch on YouTube](https://youtu.be/ZEE-jNAthB0?si=ABQX_ApyBbGDD5SZ)
 
 
